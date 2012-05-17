@@ -30,7 +30,6 @@
   , "jade": "0.x.x"
   , "connect-assets": "2.1.5"
   , "stylus": "*"
-  , "nib" : "*"
   }
 , "devDependencies":
   { "vows"    :  "0.5.x"
