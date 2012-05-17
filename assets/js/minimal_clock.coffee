@@ -130,14 +130,17 @@ do ($=jQuery) ->
 			m = now.getMinutes()
 			s = now.getSeconds()
 			
+			# Alternate clocks so that number stays the same when fading
 			if s % 2 == 0
 				clock1.draw h, m, s
 			else
 				clock2.draw h, m, s
-		
+			
+			# Toggle both clocks to get the crossfade effect
 			clock1.toggle()
 			clock2.toggle()
 			
+			# Knobs and timebars not as complicated as clock !
 			knobs.draw h, m, s
 			timebars.draw h, m, s
 		
