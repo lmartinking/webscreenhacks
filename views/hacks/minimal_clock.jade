@@ -12,15 +12,15 @@ block extrajs
 block content
     #clocks
         - for clock in [1, 2]
-            div(id="clock#{clock}")
+            div.clock(id="clock#{clock}")
                 .time
                     span.hours
                     span.separator :
                     span.minutes
-                    span.separator :
+                    span.separator.second :
                     span.seconds
         
-    #knobs
+    #knobs.knobs
         .hours
             input.knob(data-max='12', data-thickness='0.2', value='0')
         .minutes
@@ -28,7 +28,7 @@ block content
         .seconds
             input.knob(data-max='60', data-thickness='0.2', value='0')
     
-    #timebars
+    #timebars.timebars
         span.hours
         span.minutes
         span.seconds

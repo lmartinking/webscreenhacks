@@ -105,6 +105,7 @@ class Clock
 		@hours.text pad(h)
 		@minutes.text pad(m)
 		@seconds.text pad(s)
+		@$el.show()
 	
 	toggle: (hidden_seperators) ->
 		if settings.clock.blink_separators
