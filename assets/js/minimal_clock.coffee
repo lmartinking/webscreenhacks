@@ -14,11 +14,27 @@ class Knob
 	
 	setup: ->
 		@$el.knob()
+		@max = Number(@$el.attr "data-max")
 		@control = @$el.data 'knobControl'
 		
 	draw: (value) ->
-		@control.setVal value
-		@control.draw()
+		if value == 0
+			@reverse()
+		else
+			@control.setVal value
+			@control.draw()
+	
+	reverse: (value) ->
+		val = @max
+		interval = undefined
+		next_step = =>
+			val -= 1
+			if val == 0
+				clearInterval interval
+			else
+				@draw val
+		
+		interval = setInterval next_step, 1000 / 60
 		
 class TimeBar
 	constructor: (@typ, @$el) ->
@@ -85,15 +101,15 @@ class Clock
 		@minutes.addClass initial_cls
 		@seconds.addClass initial_cls
 		
-	draw: (h, m, s) ->
-		if settings.clock.blink_separators
-			@separators.each -> $(this).toggleClass "transparent"
-			
+	draw: (h, m, s) ->			
 		@hours.text pad(h)
 		@minutes.text pad(m)
 		@seconds.text pad(s)
 	
 	toggle: (hidden_seperators) ->
+		if settings.clock.blink_separators
+			@separators.each -> $(this).toggleClass "transparent"
+		
 		@hours.toggleClass("fadeout").toggleClass("fadein")
 		@minutes.toggleClass("fadeout").toggleClass("fadein")
 		@seconds.toggleClass("fadeout").toggleClass("fadein")
@@ -118,16 +134,22 @@ do ($=jQuery) ->
 				clock1.draw h, m, s
 			else
 				clock2.draw h, m, s
+		
 			clock1.toggle()
 			clock2.toggle()
 			
 			knobs.draw h, m, s
 			timebars.draw h, m, s
-				
+		
+		# Setup clocks and make sure one is hidden
+		# And make sure that clock1 is the one that starts hidden
+		# To align with what happens to clock1 in twitch
+		s = new Date().getSeconds()
+		clock1.setup(s % 2 == 0)
+		clock2.setup(s % 2 == 1)
+		
 		# Initial setup
 		knobs.setup()
-		clock1.setup()
-		clock2.setup(true)
 		timebars.setup(new Date().getSeconds())
 		
 		# Don't need to wait a full second for things to appear
