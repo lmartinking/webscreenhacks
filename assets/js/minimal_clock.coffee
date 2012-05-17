@@ -1,119 +1,137 @@
-do ($=JQuery) ->
-	clock =
+settings =
+	clock:
 		show_seconds: true
 		blink_separators: true
+		
+pad = (num) ->
+	if num < 10
+		"0#{num}"
+	else
+		"#{num}"
 
-	pad = (num) ->
-		if num < 10
-			"0#{num}"
-		else
-			"#{num}"
-
-	unless clock.show_seconds
-		$("#clock").addClass('noseconds')
-
-	draw_clock = (h, m, s) ->
-		mins = "<span class='minutes'>#{pad(m)}</span>"
-		hours = "<span class='hours'>#{pad(h)}</span>"
-		seconds = s
-
-		sep = if seconds % 2 == 0 or not clock.blink_separators
-				"<span class='separator'>:</span>"
-			else
-				"<span class='separator separator-odd'>:</span>"
-
-		if clock.show_seconds
-			secs = "<span class='seconds'>#{pad(seconds)}</span>";
-			time = [hours, sep, mins, sep, secs].join("")
-		else
-			time = [hours, sep, mins].join("")
-
-		newtime = $("<span class='time'>#{time}</span>")
-
-		old = $("#clock").children()
-
-		newtime.hide().appendTo("#clock").fadeIn 500, ->
-			$(old).each ->
-				$(this).remove()
-
-	hknob = undefined
-	mknob = undefined
-	sknob = undefined
+class Knob
+	constructor: (@typ, @$el) ->
 	
-	setup_knobs = ->
-		knobs = $("#knobs")
-		hknob = $("<div class='hours'><input class='knob'   id='hknob' data-max='12' data-thickness='0.2' value='0'/><div>").appendTo(knobs)
-		mknob = $("<div class='minutes'><input class='knob' id='mknob' data-max='60' data-thickness='0.2' value='0'/><div>").appendTo(knobs)
-		sknob = $("<div class='seconds'><input class='knob' id='sknob' data-max='60' data-thickness='0.2' value='0'/><div>").appendTo(knobs)
+	setup: ->
+		@$el.knob()
+		@control = @$el.data 'knobControl'
+		
+	draw: (value) ->
+		@control.setVal value
+		@control.draw()
+		
+class TimeBar
+	constructor: (@typ, @$el) ->
+		
+	width: (val) ->
+		@$el.width val
+		
+	draw: (width, duration, easing, complete) ->
+		@$el.stop().animate {width}, duration, easing, complete
 
-		knobs.find(".knob").knob()
-
-		hknob = hknob.find(".knob").data('knobControl')
-		mknob = mknob.find(".knob").data('knobControl')
-		sknob = sknob.find(".knob").data('knobControl')
-
-	draw_knobs = (h, m, s) ->
+class Knobs
+	constructor: (@container) ->
+		@elements = ['hours', 'minutes', 'seconds']
+		for element in @elements
+			@[element] = new Knob(element, $ ".#{element} input", @container)
+	
+	draw: (h, m, s) ->
 		h -= 12 if h >= 12
-		hknob.setVal(h); hknob.draw()
-		mknob.setVal(m); mknob.draw()
-		sknob.setVal(s); sknob.draw()
+		@hours.draw(h)
+		@minutes.draw(m)
+		@seconds.draw(s)
+	
+	setup: ->
+		@[element].setup() for element in @elements
 
-	hbar = undefined
-	mbar = undefined
-	sbar = undefined
+class TimeBars
+	constructor: (@$el) ->
+		for element in ['seconds', 'minutes', 'hours']
+			@[element] = new TimeBar element, $ ".#{element}", @$el
+	
+	setup:(s) ->
+		w = @$el.width()
+		diff = 59 - s
+		@seconds.width(s / 60 * w)
+		@seconds.draw w, diff * 1000, 'linear'		
+	
+	draw: (h, m, s) ->
+		w = @$el.width()
 
-	setup_timebars = ->
-		tb = $("#timebars")
-		hbar = $("<span class='hours'></span>").appendTo(tb)
-		mbar = $("<span class='minutes'></span>").appendTo(tb)
-		sbar = $("<span class='seconds'></span>").appendTo(tb)
-
-	timebar_started = false
-
-	draw_timebars = (h, m, s) ->
-		w = $("#timebars").width()
-
-		hbar.animate
-			width: (h / 24 * w).toFixed(0)
-		, 500
+		@hours.draw (h / 24 * w).toFixed(0), 500
+		@minutes.draw (m / 60 * w).toFixed(0), 500
 		
-		mbar.animate
-			width: (m / 60 * w).toFixed(0)
-		, 500
-
-		unless timebar_started
-			diff = 59 - s
-
-			sbar.width(s / 60 * w)
-			sbar.animate
-				width: w
-			, diff * 1000
-			, 'linear'
-
-			timebar_started = true
-
 		if s == 59
-			sbar.stop().animate
-				width: 0
-			, 1000
+			@seconds.draw 0, 1000
 		
-		if s == 0
-			sbar.stop().animate
-				width: w
-			, 59000
-			, 'linear'
+		else if s == 0
+			@seconds.draw w, 59000, 'linear'
+	
+class Clock
+	constructor: (@$el) ->
+		@separators = $ ".separator", @$el
+		for element in ['seconds', 'minutes', 'hours']
+			@[element] = $ ".#{element}", @$el
+	
+	setup: (start_hidden) ->
+		unless settings.clock.show_seconds
+			@$el.addClass 'noseconds'
+		
+		initial_cls = "fadein"
+		if start_hidden
+			initial_cls = "fadeout"
+		
+		@hours.addClass initial_cls
+		@minutes.addClass initial_cls
+		@seconds.addClass initial_cls
+		
+	draw: (h, m, s) ->
+		if settings.clock.blink_separators
+			@separators.each -> $(this).toggleClass "transparent"
+			
+		@hours.text pad(h)
+		@minutes.text pad(m)
+		@seconds.text pad(s)
+	
+	toggle: (hidden_seperators) ->
+		@hours.toggleClass("fadeout").toggleClass("fadein")
+		@minutes.toggleClass("fadeout").toggleClass("fadein")
+		@seconds.toggleClass("fadeout").toggleClass("fadein")
 
-	draw_looped = ->
-		now = new Date()
-		h = now.getHours()
-		m = now.getMinutes()
-		s = now.getSeconds()
-
-		draw_clock(h, m, s)
-		draw_timebars(h, m, s)
-		draw_knobs(h, m, s)
-		setTimeout( draw_looped, 1000)
-
-	setup_knobs()
-	setup_timebars()
-	draw_looped()
+do ($=jQuery) ->
+	$ ->
+		# Two clocks so we can do nice fades
+		clock1 = new Clock $("#clock1")
+		clock2 = new Clock $("#clock2")
+		
+		knobs = new Knobs $("#knobs")
+		timebars = new TimeBars $("#timebars")
+		
+		# Loop that updates drawing
+		twitch = ->
+			now = new Date()
+			h = now.getHours()
+			m = now.getMinutes()
+			s = now.getSeconds()
+			
+			if s % 2 == 0
+				clock1.draw h, m, s
+			else
+				clock2.draw h, m, s
+			clock1.toggle()
+			clock2.toggle()
+			
+			knobs.draw h, m, s
+			timebars.draw h, m, s
+				
+		# Initial setup
+		knobs.setup()
+		clock1.setup()
+		clock2.setup(true)
+		timebars.setup(new Date().getSeconds())
+		
+		# Don't need to wait a full second for things to appear
+		twitch()
+		
+		# Make it twitch every second
+		setInterval twitch, 1000

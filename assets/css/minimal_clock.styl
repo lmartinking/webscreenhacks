@@ -1,3 +1,5 @@
+@import 'nib'
+
 @font-face {
     font-family: 'Geosans Light';
     src: url('/fonts/geosanslight.ttf') format('truetype');
@@ -11,15 +13,13 @@ body {
 	padding: 0px;
 }
 
-#clock {
+#clocks {
 	position: fixed;
 	bottom: 150px;
 	right: 150px;
 
 	width: 380px;
 	height: 100px;
-
-	/*background: rgba(255,255,255,0.5);*/
 
 	font-family: 'Geosans Light';
 
@@ -33,7 +33,7 @@ body {
 	width: 270px !important;
 }
 
-#clock .time {
+#clocks .time {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -41,7 +41,7 @@ body {
 	display: block;
 	border: 10px solid #404040;
 
-	background: #404040;
+	//background: #404040;
 }
 
 .separator {
@@ -52,11 +52,15 @@ body {
 	height: inherit;
 }
 
-.separator-odd {
+.hidden {
 	color: transparent;
 }
 
-#clock .seconds {
+.transparent {
+	color: transparent;
+}
+
+#clocks .seconds {
 	font-size: 46px;
 	position: relative;
 	bottom: -1px;
@@ -68,9 +72,6 @@ body {
 	
 	left: 150px;
 	right: 150px;
-
-	/*width: 500px;*/
-	/*height: 105px;*/
 }
 
 #timebars span {
@@ -92,17 +93,37 @@ body {
 
 #knobs .knob {
 	display: none;
-}
-
-#knobs .hours, #knobs .minutes, #knobs .seconds {
-	display: inline-block;
-}
-
-#hknob, #mknob, #sknob {
 	width: 300px;
 	height: 300px;
 }
 
-#hknob_knob, #mknob_knob, #sknob_knob {
+#knobs > div {
 	color: #ababab;
+	display: inline-block;
+}
+
+@keyframes fadeout
+	from
+		opacity 1.0
+	to
+		opacity 0.0
+
+@keyframes fadein
+	from
+		opacity 0.0
+	to
+		opacity 1.0
+
+.fadeout {
+	opacity: 0.0;
+	animation-name: fadeout;
+	animation-duration: 0.8s;
+	animation-timing-function: linear;
+}
+
+.fadein {
+	opacity: 1.0;
+	animation-name: fadein;
+	animation-duration: 0.0s;
+	animation-timing-function: linear;
 }
