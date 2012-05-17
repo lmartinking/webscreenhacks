@@ -1,0 +1,108 @@
+@font-face {
+    font-family: 'Geosans Light';
+    src: url('geosanslight.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+	background: #404040;
+	margin: 0px;
+	padding: 0px;
+}
+
+#clock {
+	position: fixed;
+	bottom: 150px;
+	right: 150px;
+
+	width: 380px;
+	height: 100px;
+
+	/*background: rgba(255,255,255,0.5);*/
+
+	font-family: 'Geosans Light';
+
+	line-height: 100px;
+	font-size: 96px;
+
+	color: white;
+}
+
+.noseconds {
+	width: 270px !important;
+}
+
+#clock .time {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	display: block;
+	border: 10px solid #404040;
+
+	background: #404040;
+}
+
+.separator {
+	color: #ababab;
+	margin: 0px 2px;
+	display: inline-block;
+	line-height: inherit;
+	height: inherit;
+}
+
+.separator-odd {
+	color: transparent;
+}
+
+#clock .seconds {
+	font-size: 46px;
+	position: relative;
+	bottom: -1px;
+}
+
+#timebars {
+	position: fixed;
+	top: 150px;
+	
+	left: 150px;
+	right: 150px;
+
+	/*width: 500px;*/
+	/*height: 105px;*/
+}
+
+#timebars span {
+	display: block;
+	background: #ababab;
+	height: 6px;
+	margin: 3px 0px;
+
+	border-radius: 3px;
+}
+
+#knobs {
+	position: fixed;
+	bottom: 0;
+	top: 250px;
+	left: 150px;
+	text-align: center;
+}
+
+#knobs .knob {
+	display: none;
+}
+
+#knobs .hours, #knobs .minutes, #knobs .seconds {
+	display: inline-block;
+}
+
+#hknob, #mknob, #sknob {
+	width: 300px;
+	height: 300px;
+}
+
+#hknob_knob, #mknob_knob, #sknob_knob {
+	color: #ababab;
+}

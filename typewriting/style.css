@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Traveling Typewriter';
+    src: url('tt.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+	background: #ababab;
+}
+
+#typewriting {
+	font-size: 48pt;
+	font-family: 'Traveling Typewriter';
+
+	line-height: 52pt;
+	word-wrap: break-word;
+
+	position: fixed;
+	bottom: 20%;
+	left: 5%;
+	right: 5%;
+}
