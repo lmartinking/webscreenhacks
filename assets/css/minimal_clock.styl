@@ -1,127 +1,108 @@
-@font-face {
-    font-family: 'Geosans Light';
-    src: url('/fonts/geosanslight.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+@import 'nib'
 
-body {
-	background: #404040;
-	margin: 0px;
-	padding: 0px;
-}
+@font-face
+    font-style: normal
+    font-weight: normal
+    font-family: 'Geosans Light'
+    src: url('/fonts/geosanslight.ttf') format('truetype')
 
-#clocks {
-	position: fixed;
-	bottom: 150px;
-	right: 150px;
+body
+    background: #404040
+    margin: 0px
+    padding: 0px
 
-	width: 380px;
-	height: 100px;
+.transparent
+    color: transparent
 
-	font-family: 'Geosans Light';
+#clocks
+    position: fixed
+    bottom: 150px
+    right: 150px
 
-	line-height: 100px;
-	font-size: 96px;
+    width: 380px
+    height: 100px
 
-	color: white;
-}
+    font-family: 'Geosans Light'
 
-.noseconds {
-	width: 270px !important;
-}
+    line-height: 100px
+    font-size: 96px
 
-#clocks .time {
-	position: absolute;
-	top: 0;
-	left: 0;
+    color: white
+    
+    & .time
+        position: absolute
+        top: 0
+        left: 0
 
-	display: block;
-	border: 10px solid #404040;
+        display: block
+        border: 10px solid #404040
+    
+    & .separator
+        color: #ababab
+        margin: 0px 2px
+        display: inline-block
+        line-height: inherit
+        height: inherit
+    
+    & .seconds
+        font-size: 46px
+        position: relative
+        bottom: -1px
 
-	//background: #404040;
-}
+    & .noseconds
+        width: 270px !important
 
-.separator {
-	color: #ababab;
-	margin: 0px 2px;
-	display: inline-block;
-	line-height: inherit;
-	height: inherit;
-}
+#timebars
+    position: fixed
+    top: 150px
+    
+    left: 150px
+    right: 150px
 
-.hidden {
-	color: transparent;
-}
+    & span
+        display: block
+        background: #ababab
+        height: 6px
+        margin: 3px 0px
 
-.transparent {
-	color: transparent;
-}
+        border-radius: 3px
 
-#clocks .seconds {
-	font-size: 46px;
-	position: relative;
-	bottom: -1px;
-}
+#knobs
+    position: fixed
+    bottom: 0
+    top: 250px
+    left: 150px
+    text-align: center
 
-#timebars {
-	position: fixed;
-	top: 150px;
-	
-	left: 150px;
-	right: 150px;
-}
+    & .knob
+        display: none
+        width: 300px
+        height: 300px
 
-#timebars span {
-	display: block;
-	background: #ababab;
-	height: 6px;
-	margin: 3px 0px;
-
-	border-radius: 3px;
-}
-
-#knobs {
-	position: fixed;
-	bottom: 0;
-	top: 250px;
-	left: 150px;
-	text-align: center;
-}
-
-#knobs .knob {
-	display: none;
-	width: 300px;
-	height: 300px;
-}
-
-#knobs > div {
-	color: #ababab;
-	display: inline-block;
-}
+    & > div
+        color: #ababab
+        display: inline-block
 
 @keyframes fadeout
-	from
-		opacity 1.0
-	to
-		opacity 0.0
+    from
+        opacity 1.0
+    to
+        opacity 0.0
 
 @keyframes fadein
-	from
-		opacity 0.0
-	to
-		opacity 1.0
+    from
+        opacity 0.0
+    to
+        opacity 1.0
 
-.fadeout {
-	opacity: 0.0;
-	animation-name: fadeout;
-	animation-duration: 0.8s;
-	animation-timing-function: linear;
-}
+.fadeout
+    opacity: 0.0
+    animation-name: fadeout
+    animation-duration: 0.8s
+    animation-timing-function: linear
 
-.fadein {
-	opacity: 1.0;
-	animation-name: fadein;
-	animation-duration: 0.0s;
-	animation-timing-function: linear;
-}
+.fadein
+    opacity: 1.0
+    animation-name: fadein
+    animation-duration: 0.0s
+    animation-timing-function: linear
