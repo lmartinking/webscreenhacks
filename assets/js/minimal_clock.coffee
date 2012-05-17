@@ -1,4 +1,6 @@
 settings =
+	time:
+		debug: false
 	clock:
 		show_seconds: true
 		blink_separators: true
@@ -17,12 +19,15 @@ class Knob
 		@max = Number(@$el.attr "data-max")
 		@control = @$el.data 'knobControl'
 		
-	draw: (value) ->
-		if value == 0
+	draw: (value, forced=false) ->
+		@last_value ?= value unless forced
+		if value == 0 and @last_value == @max - 1
 			@reverse()
 		else
 			@control.setVal value
 			@control.draw()
+		
+		@last_value = value unless forced
 	
 	reverse: (value) ->
 		val = @max
@@ -32,9 +37,9 @@ class Knob
 			if val == 0
 				clearInterval interval
 			else
-				@draw val
+				@draw val, true
 		
-		interval = setInterval next_step, 1000 / 60
+		interval = setInterval next_step, Math.floor(1000 / @max)
 		
 class TimeBar
 	constructor: (@typ, @$el) ->
@@ -115,6 +120,37 @@ class Clock
 		@minutes.toggleClass("fadeout").toggleClass("fadein")
 		@seconds.toggleClass("fadeout").toggleClass("fadein")
 
+# Make a function that returns the time
+# Debug version forces time to be just before midnight
+make_time_teller = (debug) ->
+	unless debug
+		time_teller = ->
+			now = new Date()
+			h = now.getHours()
+			m = now.getMinutes()
+			s = now.getSeconds()
+			[h, m, s]
+	else
+		# Force it to be next to midnight	
+		h = 23
+		m = 59
+		s = 55
+		time_teller = (progress=0) ->
+			if s == 60
+				s = 0
+				m += 1
+			
+			if m == 60
+				m = 0
+				h += 1
+			
+			if h == 24
+				h = 0
+			
+			result = [h, m, s]
+			s += progress
+			result
+	
 do ($=jQuery) ->
 	$ ->
 		# Two clocks so we can do nice fades
@@ -124,12 +160,12 @@ do ($=jQuery) ->
 		knobs = new Knobs $("#knobs")
 		timebars = new TimeBars $("#timebars")
 		
+		# Get function to determine h, m and s
+		time_teller = make_time_teller(settings.time.debug)
+		
 		# Loop that updates drawing
 		twitch = ->
-			now = new Date()
-			h = now.getHours()
-			m = now.getMinutes()
-			s = now.getSeconds()
+			[h, m, s] = time_teller(1)
 			
 			# Alternate clocks so that number stays the same when fading
 			if s % 2 == 0
@@ -148,7 +184,7 @@ do ($=jQuery) ->
 		# Setup clocks and make sure one is hidden
 		# And make sure that clock1 is the one that starts hidden
 		# To align with what happens to clock1 in twitch
-		s = new Date().getSeconds()
+		[h, m, s] = time_teller()
 		clock1.setup(s % 2 == 0)
 		clock2.setup(s % 2 == 1)
 		
