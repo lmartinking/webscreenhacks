@@ -1,0 +1,110 @@
+@import 'nib'
+
+@font-face
+    font-style: normal
+    font-weight: normal
+    font-family: 'Geosans Light'
+    src: url('/fonts/geosanslight.ttf') format('truetype')
+
+body
+    background: #404040
+    margin: 0px
+    padding: 0px
+
+.transparent
+    color: transparent!important
+
+.clock
+    width: 380px
+    height: 100px
+    
+    right: 150px
+    bottom: 150px
+    position: fixed
+
+    color: white
+    font-size: 96px
+    line-height: 100px
+    font-family: 'Geosans Light'
+    
+    // Start off hidden
+    display: none
+        
+    &.noseconds
+        width: 270px !important
+        
+        .seconds, .separator.second
+        	display:none
+    
+    .time
+        top: 0
+        left: 0
+        display: block
+        position: absolute
+
+        border: 10px solid #404040
+        
+        .seconds
+	        bottom: -1px
+	        position: relative
+	        font-size: 46px
+        
+        .separator
+	        color: #ababab
+	        height: inherit
+	        margin: 0px 2px
+	        display: inline-block
+	        line-height: inherit
+
+.timebars
+    top: 150px
+    left: 150px
+    right: 150px
+    position: fixed
+
+    span
+        height: 6px
+        margin: 3px 0px
+        display: block
+        background: #ababab
+        border-radius: 3px
+
+.knobs
+    top: 250px
+    left: 150px
+    bottom: 0
+    position: fixed
+    text-align: center
+
+    .knob
+        width: 300px
+        height: 300px
+        display: none
+
+    > div
+        color: #ababab
+        display: inline-block
+
+@keyframes fadeout
+    from
+        opacity 1.0
+    to
+        opacity 0.0
+
+@keyframes fadein
+    from
+        opacity 0.0
+    to
+        opacity 1.0
+
+.fadeout
+    opacity: 0.0
+    animation-name: fadeout
+    animation-duration: 0.8s
+    animation-timing-function: linear
+
+.fadein
+    opacity: 1.0
+    animation-name: fadein
+    animation-duration: 0.0s
+    animation-timing-function: linear

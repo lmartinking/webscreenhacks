@@ -1,0 +1,46 @@
+{
+  "name": "webscreenhacks"
+, "preferGlobal": "false"
+, "version": "0.0.1"
+, "author": "Lucas Martin-King <lmartinking@gmail.com>"
+, "description": "Hacky web screensavers for great good"
+, "contributors":
+  [ 
+    { "name": "Stephen Moore"
+    , "email": "stephen@delfick.com"
+    } 
+  ]
+, "scripts":
+  { "start": "./start.js"
+  , "debug" : "supervisor -e coffee start.js"
+  , "test": "vows --spec --isolate"
+  }
+, "repository":
+  { "type": "git"
+  , "url": "http://bitbucket.org/lmartinking/webscreenhacks.git"
+  }
+, "keywords":
+  [ "screensaver"
+  , "web"
+  , "hacky"
+  ]
+, "dependencies" :
+  { "coffee-script": "1.1.x"
+  , "express": "2.5.x" 
+  , "jade": "0.x.x"
+  , "connect-assets": "2.1.5"
+  , "stylus": "*"
+  , "nib" : "*"
+  }
+, "devDependencies":
+  { "vows"    :  "0.5.x"
+  , "supervisor" : "*"
+  }
+, "bundleDependencies":
+  [
+  ]
+, "license": "WTFPL"
+, "engine":
+  { "node": ">=0.6"
+  }
+}

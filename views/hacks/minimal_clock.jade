@@ -1,0 +1,34 @@
+extends ../layout
+
+block extrahead
+    title Minimal Clock
+
+block extracss
+    != css('minimal_clock')
+
+block extrajs
+    != js('minimal_clock')
+
+block content
+    #clocks
+        - for clock in [1, 2]
+            div.clock(id="clock#{clock}")
+                .time
+                    span.hours
+                    span.separator :
+                    span.minutes
+                    span.separator.second :
+                    span.seconds
+        
+    #knobs.knobs
+        .hours
+            input.knob(data-max='12', data-thickness='0.2', value='0')
+        .minutes
+            input.knob(data-max='60', data-thickness='0.2', value='0')
+        .seconds
+            input.knob(data-max='60', data-thickness='0.2', value='0')
+    
+    #timebars.timebars
+        span.hours
+        span.minutes
+        span.seconds
