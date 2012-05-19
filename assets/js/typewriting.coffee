@@ -10,7 +10,7 @@ class BackspaceToken
 	constructor: (@taking) ->
 
 class CharacterToken
-	constructor: (@mistake, @char) ->
+	constructor: (@mistake, @char, @noticeable) ->
 
 ########################
 #   TOKENS STREAM GENERATOR
@@ -68,7 +68,7 @@ class ActionStream
 
 class StreamAnalyser
 	constructor: (@actionstream, @text, @keyboard_map) ->
-		@index = -1
+		@index = 0
 		@token = undefined
 		@since_last_mistake = undefined
 	
@@ -92,20 +92,24 @@ class StreamAnalyser
 			when CharacterToken
 				# Make planned if haven't planned this token yet
 				@planned ?= @plan_string token.mistake
+				[correct, typed] = @planned
+				
 				if token.mistake
 					@since_last_mistake ?= []
 				
 				# Get next char from plan
 				# And add to since_last_mistake if we have such a a list
-				char = @planned.pop()
+				char = typed.pop()
+				correct_char = correct.pop()
+				
 				if @since_last_mistake?
 					@since_last_mistake.push token.mistake
 				
 				# Return a token with the next character
-				token = new CharacterToken token.mistake, char
+				token = new CharacterToken token.mistake, char, char != correct_char
 				
 				# Need a new token if run out of planned
-				if @planned.length == 0
+				if typed.length == 0
 					@token = undefined
 					@planned = undefined
 			
@@ -125,10 +129,10 @@ class StreamAnalyser
 			@text[@index + i]
 		
 		if mistake
-			@keyboard_map.dyslexic_line(correct)
+			[correct, @keyboard_map.dyslexic_line(correct)]
 		else
 			@index += length
-			correct
+			[(char for char in correct), correct]
 	
 	exhausted: ->
 		@index == @text.length
@@ -148,14 +152,18 @@ class TypeWriter
 		switch token.constructor
 			when BackspaceToken
 				txt = @$el.text()
-				@$el.text txt.substring(0, txt.length - 1)
+				@$el.children().last().remove()
 				@backspace_timeout()
 			
 			when PauseToken
 				token.timeout
 			
 			when CharacterToken
-				@$el.append token.char
+				char_span = $("<span/>").text token.char
+				if token.noticeable
+					char_span.addClass("noticeable")
+				
+				@$el.append char_span
 				@character_timeout(token.mistake)
 	
 	backspace_timeout: -> 100
