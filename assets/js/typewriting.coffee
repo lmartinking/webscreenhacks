@@ -1,13 +1,3 @@
-random_string = (length) ->
-	chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz"
-	result = []
-
-	for i in [0...length]
-		rnum = Math.floor(Math.random() * chars.length)
-		result.push chars.substring(rnum, rnum + 1)
-
-	result.join ""
-
 ########################
 #   TOKENS FOR THE TOKEN STREAM
 ########################
@@ -77,7 +67,7 @@ class ActionStream
 # What is done with these characters/actions isn't up to the analyser
 
 class StreamAnalyser
-	constructor: (@actionstream, @text) ->
+	constructor: (@actionstream, @text, @keyboard_map) ->
 		@index = -1
 		@token = undefined
 		@since_last_mistake = undefined
@@ -127,16 +117,18 @@ class StreamAnalyser
 	
 	plan_string: (mistake) ->
 		random = Math.random()
-		length = (Math.abs(random - 0.5) * random) || 1
+		length = Math.ceil(Math.abs(random - 0.5) * random) || 1
 		max_length = @text.length - @index
 		length = max_length if length > max_length
 		
+		correct = for i in [0...length]
+			@text[@index + i]
+		
 		if mistake
-			random_string(length).split("")
+			@keyboard_map.dyslexic_line(correct)
 		else
-			for index in [0...length]
-				@index += 1
-				@text[@index]
+			@index += length
+			correct
 	
 	exhausted: ->
 		@index == @text.length
@@ -176,6 +168,7 @@ do ($=jQuery) ->
 	$ ->
 		typewriter = new TypeWriter $("#typewriting")
 		actionstream = new ActionStream()
+		keyboard_map = new KeyboardMap()
 		
 		text = """
 			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -188,7 +181,7 @@ do ($=jQuery) ->
 		
 		twitch = ->
 			if not analyser? or analyser.exhausted()
-				analyser = new StreamAnalyser(actionstream, text)
+				analyser = new StreamAnalyser(actionstream, text, keyboard_map)
 			
 			timeout = typewriter.draw(analyser)
 			setTimeout twitch, timeout
