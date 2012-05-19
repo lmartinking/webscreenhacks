@@ -13,7 +13,7 @@
 , "scripts":
   { "start": "./start.js"
   , "debug" : "supervisor -e coffee start.js"
-  , "test": "vows --spec --isolate"
+  , "test": "jasmine-node --color --autotest --coffee --test-dir specs"
   }
 , "repository":
   { "type": "git"
@@ -33,7 +33,7 @@
   , "nib" : "*"
   }
 , "devDependencies":
-  { "vows"    :  "0.5.x"
+  { "jasmine-node": "*"
   , "supervisor" : "*"
   }
 , "bundleDependencies":
