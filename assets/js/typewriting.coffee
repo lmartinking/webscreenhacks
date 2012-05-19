@@ -36,7 +36,7 @@ class ActionStream
 				else
 					@make_character()
 		
-		if token.mistake or @stack.length > 0
+		if token.constructor is CharacterToken and (token.mistake or @stack.length > 0)
 			@stack.push token
 		token
 	
