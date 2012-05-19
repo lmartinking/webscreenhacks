@@ -1,3 +1,5 @@
+exports = exports? and @ or @typing = {}
+ 
 ########################
 #   TOKENS FOR THE TOKEN STREAM
 ########################
@@ -11,6 +13,10 @@ class BackspaceToken
 
 class CharacterToken
 	constructor: (@mistake, @char, @noticeable) ->
+
+exports.PauseToken = PauseToken
+exports.BackspaceToken = BackspaceToken
+exports.CharacterToken = CharacterToken
 
 ########################
 #   TOKENS STREAM GENERATOR
@@ -58,6 +64,8 @@ class ActionStream
 	
 	notice_mistake: ->
 		@stack.length > 5 or Math.random() > 0.8
+
+exports.ActionStream = ActionStream
 
 ########################
 #   TOKEN STREAM CONSUMER
@@ -137,6 +145,8 @@ class StreamAnalyser
 	exhausted: ->
 		@index == @text.length
 
+exports.StreamAnalyser = StreamAnalyser
+
 ########################
 #   TYPEWRITER
 ########################
@@ -172,9 +182,13 @@ class TypeWriter
 		multiplier = if mistake then 2000 else 1000
 		50 + Math.random() * Math.random() * multiplier
 
-do ($=jQuery) ->
-	$ ->
-		typewriter = new TypeWriter $("#typewriting")
+exports.TypeWriter = TypeWriter
+
+########################
+#   STARTER
+########################
+
+exports.start_typwriter = (typewriter) ->
 		actionstream = new ActionStream()
 		keyboard_map = new KeyboardMap()
 		

@@ -9,6 +9,11 @@ block extracss
 block extrajs
     != js('keyboard_map')
     != js('typewriting')
+    :coffeescript
+        do ($ = jQuery) ->
+            $ ->
+                typewriter = new typing.TypeWriter $("#typewriting")
+                typing.start_typwriter(typewriter)
 
 block content
     #typewriting
