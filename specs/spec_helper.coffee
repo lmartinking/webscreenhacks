@@ -1,0 +1,1 @@
+require('buster').spec.expose()

@@ -13,7 +13,7 @@
 , "scripts":
   { "start": "./start.js"
   , "debug" : "supervisor -e coffee start.js"
-  , "test": "jasmine-node --color --autotest --coffee --test-dir specs"
+  , "test": "buster test"
   }
 , "repository":
   { "type": "git"
@@ -33,7 +33,7 @@
   , "nib" : "*"
   }
 , "devDependencies":
-  { "jasmine-node": "*"
+  { "buster": "*"
   , "supervisor" : "*"
   }
 , "bundleDependencies":

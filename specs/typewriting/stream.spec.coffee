@@ -45,79 +45,79 @@ describe "Typewriting", ->
         describe "Determining next action", ->
             it "returns a backspace if it should", ->
                 backspace_token = {}
-                spyOn(@stream, 'should_backspace').andReturn true
-                spyOn(@stream, 'make_backspace').andReturn backspace_token
+                @stub(@stream, 'should_backspace').returns true
+                @stub(@stream, 'make_backspace').returns backspace_token
                 expect(@stream.next()).toBe backspace_token
             
             it "returns a pause if no backspace but pause is needed", ->
                 pause_token = {}
-                spyOn(@stream, 'should_backspace').andReturn false
+                @stub(@stream, 'should_backspace').returns false
                 @stream.needs_pause = true
                 
-                spyOn(@stream, 'make_pause').andReturn pause_token
+                @stub(@stream, 'make_pause').returns pause_token
                 expect(@stream.next()).toBe pause_token
                 
             it "returns a character if no backspace or pause", ->
                 character_token = {}
-                spyOn(@stream, 'should_backspace').andReturn false
+                @stub(@stream, 'should_backspace').returns false
                 @stream.needs_pause = false
                 
-                spyOn(@stream, 'make_character').andReturn character_token
+                @stub(@stream, 'make_character').returns character_token
                 expect(@stream.next()).toBe character_token
             
             it "doesn't make a pause or character if should backspace", ->
-                spyOn(@stream, 'make_pause')
-                spyOn(@stream, 'make_character')
-                spyOn(@stream, 'should_backspace').andReturn true
+                @stub(@stream, 'make_pause')
+                @stub(@stream, 'make_character')
+                @stub(@stream, 'should_backspace').returns true
                 @stream.next()
                 
-                expect(@stream.make_pause).wasNotCalled()
-                expect(@stream.make_character).wasNotCalled()
+                refute.called(@stream.make_pause)
+                refute.called(@stream.make_character)
             
             it "doesn't make a backspace or character if should pause", ->
-                spyOn(@stream, 'make_backspace')
-                spyOn(@stream, 'make_character')
-                spyOn(@stream, 'should_backspace').andReturn false
+                @stub(@stream, 'make_backspace')
+                @stub(@stream, 'make_character')
+                @stub(@stream, 'should_backspace').returns false
                 @stream.needs_pause = true
                 @stream.next()
                 
-                expect(@stream.make_backspace).wasNotCalled()
-                expect(@stream.make_character).wasNotCalled()
+                refute.called(@stream.make_backspace)
+                refute.called(@stream.make_character)
             
             it "doesn't make a backspace or pause if should pause", ->
-                spyOn(@stream, 'make_pause')
-                spyOn(@stream, 'make_backspace')
-                spyOn(@stream, 'should_backspace').andReturn false
+                @stub(@stream, 'make_pause')
+                @stub(@stream, 'make_backspace')
+                @stub(@stream, 'should_backspace').returns false
                 @stream.needs_pause = false
                 @stream.next()
                 
-                expect(@stream.make_pause).wasNotCalled()
-                expect(@stream.make_backspace).wasNotCalled()
+                refute.called(@stream.make_pause)
+                refute.called(@stream.make_backspace)
             
             describe "When backspacing", ->
                 it "sets stack to empty", ->
                     @stream.stack = [1, 2]
-                    spyOn(@stream, 'should_backspace').andReturn true
+                    @stub(@stream, 'should_backspace').returns true
                     @stream.next()
                     expect(@stream.stack).toEqual []
                 
                 it "sets needs_pause to true", ->
                     @stream.stack.needs_pause = true
-                    spyOn(@stream, 'should_backspace').andReturn true
+                    @stub(@stream, 'should_backspace').returns true
                     @stream.next()
                     expect(@stream.needs_pause).toBe true
             
             describe "When Pausing", ->
                 it "does not add pause to the stack when stack is empty", ->
                     @stream.stack = []
-                    spyOn(@stream, 'should_backspace').andReturn false
+                    @stub(@stream, 'should_backspace').returns false
                     @stream.needs_pause = true
                     expect(@stream.next().constructor).toEqual typing.PauseToken
                     expect(@stream.stack).toEqual []
                 
                 it "does not add pause to the stack when stack is not empty", ->
                     @stream.stack = [1, 2]
-                    spyOn(@stream, 'should_backspace').andReturn false
+                    @stub(@stream, 'should_backspace').returns false
                     @stream.needs_pause = true
                     expect(@stream.next().constructor).toEqual typing.PauseToken
                     expect(@stream.stack).toEqual [1, 2]
@@ -125,11 +125,11 @@ describe "Typewriting", ->
             describe "When a Character", ->
                 beforeEach ->
                     @stream.needs_pause = false
-                    spyOn(@stream, 'should_backspace').andReturn false
+                    @stub(@stream, 'should_backspace').returns false
                 
                 it "adds character to empty stack only if character is a mistake", ->
                     character = mistake:true, constructor:typing.CharacterToken
-                    spyOn(@stream, 'make_character').andReturn character
+                    @stub(@stream, 'make_character').returns character
                     
                     @stream.stack = []
                     expect(@stream.next()).toBe character
@@ -137,7 +137,7 @@ describe "Typewriting", ->
                 
                 it "doesn't add character to empty stack if not a mistake", ->
                     character = mistake:false, constructor:typing.CharacterToken
-                    spyOn(@stream, 'make_character').andReturn character
+                    @stub(@stream, 'make_character').returns character
                     
                     @stream.stack = []
                     expect(@stream.next()).toBe character
@@ -145,7 +145,7 @@ describe "Typewriting", ->
                     
                 it "adds non-mistake character to stack if not empty", ->
                     character = mistake:false, constructor:typing.CharacterToken
-                    spyOn(@stream, 'make_character').andReturn character
+                    @stub(@stream, 'make_character').returns character
                     
                     @stream.stack = [1, 2]
                     expect(@stream.next()).toBe character
@@ -177,68 +177,68 @@ describe "Typewriting", ->
                 
                 it "tells it if it's a mistake via make_accident()", ->
                     accident = {}
-                    spyOn(@stream, 'make_accident').andReturn accident
+                    @stub(@stream, 'make_accident').returns accident
                     expect(@stream.make_character().mistake).toBe accident
             
             describe "Determining if accident should be made", ->
                 it "returns whether random number is greater than 0.9", ->
-                    spied_random = spyOn(Math, 'random')
-                    spied_random.andReturn(0.4)
+                    spied_random = @stub(Math, 'random')
+                    spied_random.returns(0.4)
                     expect(@stream.make_accident()).toBe false
                     
-                    spied_random.andReturn(0.8)
+                    spied_random.returns(0.8)
                     expect(@stream.make_accident()).toBe false
                     
-                    spied_random.andReturn(0.9)
+                    spied_random.returns(0.9)
                     expect(@stream.make_accident()).toBe false
                     
-                    spied_random.andReturn(0.91)
+                    spied_random.returns(0.91)
                     expect(@stream.make_accident()).toBe true
                     
-                    spied_random.andReturn(0.94)
+                    spied_random.returns(0.94)
                     expect(@stream.make_accident()).toBe true
                     
-                    spied_random.andReturn(1.0)
+                    spied_random.returns(1.0)
                     expect(@stream.make_accident()).toBe true
             
             describe "Determining if backspace should be made", ->
                 it "says yes if we have a stack and a mistake is noticed", ->
-                    spyOn(@stream, 'notice_mistake').andReturn true
+                    @stub(@stream, 'notice_mistake').returns true
                     @stream.stack = [1, 2]
                     expect(@stream.should_backspace()).toBe true
                 
                 it "says no if the stack is empty", ->
-                    spyOn(@stream, 'notice_mistake').andReturn true
+                    @stub(@stream, 'notice_mistake').returns true
                     @stream.stack = []
                     expect(@stream.should_backspace()).toBe false
                 
                 it "says no if we have a stack but mistake isn't noticed", ->
-                    spyOn(@stream, 'should_backspace').andReturn false
+                    @stub(@stream, 'should_backspace').returns false
                     @stream.stack = [1, 2]
                     expect(@stream.should_backspace()).toBe false
             
             describe "Noticing a mistake", ->
                 it "returns whether random number is greater than 0.8", ->
-                    spied_random = spyOn(Math, 'random')
+                    spied_random = @stub(Math, 'random')
                     @stream.stack = [1]
                     
-                    spied_random.andReturn(0.4)
+                    spied_random.returns(0.4)
                     expect(@stream.notice_mistake()).toBe false
                     
-                    spied_random.andReturn(0.8)
+                    spied_random.returns(0.8)
                     expect(@stream.notice_mistake()).toBe false
                     
-                    spied_random.andReturn(0.81)
+                    spied_random.returns(0.81)
                     expect(@stream.notice_mistake()).toBe true
                     
-                    spied_random.andReturn(0.94)
+                    spied_random.returns(0.94)
                     expect(@stream.notice_mistake()).toBe true
                     
-                    spied_random.andReturn(1.0)
+                    spied_random.returns(1.0)
                     expect(@stream.notice_mistake()).toBe true
                 
                 it "returns true if length of stack is greater than 5", ->
-                    spyOn(Math, 'random')
+                    @stub(Math, 'random')
                     @stream.stack = [1, 2, 3, 4, 5, 6]
                     expect(@stream.notice_mistake()).toBe true
-                    expect(Math.random).wasNotCalled()
+                    refute.called(Math.random)
