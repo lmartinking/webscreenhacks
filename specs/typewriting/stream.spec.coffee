@@ -1,5 +1,5 @@
 _ = require 'underscore'
-{typing} = require '../assets/js/typewriting'
+{typing} = require '../../assets/js/typewriting'
 
 describe "Typewriting", ->
     describe "Tokens", ->
