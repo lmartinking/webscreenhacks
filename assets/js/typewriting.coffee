@@ -82,49 +82,54 @@ class StreamAnalyser
 	
 	next: ->
 		token = @token ?= @actionstream.next()
-		switch @token.constructor
-			when BackspaceToken
-				taking_mistake = @since_last_mistake.pop()
-				if not taking_mistake
-					@index -= 1
-				
-				# No more backspace if no mistakes
-				if @since_last_mistake.length == 0
-					@token = undefined
-					@since_last_mistake = undefined
-			
-			when PauseToken
-				# Only pause once
-				@token = undefined
-				
-			when CharacterToken
-				# Make planned if haven't planned this token yet
-				@planned ?= @plan_string token.mistake
-				[correct, typed] = @planned
-				
-				if token.mistake
-					@since_last_mistake ?= []
-				
-				# Get next char from plan
-				# And add to since_last_mistake if we have such a a list
-				char = typed.pop()
-				correct_char = correct.pop()
-				
-				if @since_last_mistake?
-					@since_last_mistake.push token.mistake
-				
-				# Return a token with the next character
-				token = new CharacterToken token.mistake, char, char != correct_char
-				
-				# Need a new token if run out of planned
-				if typed.length == 0
-					@token = undefined
-					@planned = undefined
-			
-			else
-				# Unkown token, go to the next one
-				@token = undefined
+		func_name = "analyse_#{@token.constructor.name}"
+		func = @[func_name] ? @unknown_token
+		func.call this, token
+	
+	analyse_BackspaceToken: (token) ->
+		taking_mistake = @since_last_mistake.pop()
+		if not taking_mistake
+			@index -= 1
 		
+		# No more backspace if no mistakes
+		if @since_last_mistake.length == 0
+			@token = undefined
+			@since_last_mistake = undefined
+		
+		token
+	
+	analyse_PauseToken: (token) ->
+		# Only pause once
+		@token = undefined
+		token
+	
+	analyse_CharacterToken: (token) ->
+		# Make planned if haven't planned this token yet
+		@planned ?= @plan_string token.mistake
+		[correct, typed] = @planned
+		
+		if token.mistake
+			@since_last_mistake ?= []
+		
+		# Get next char from plan
+		# And add to since_last_mistake if we have such a a list
+		char = typed.pop()
+		correct_char = correct.pop()
+		
+		if @since_last_mistake?
+			@since_last_mistake.push token.mistake
+		
+		# Need a new token if run out of planned
+		if typed.length == 0
+			@token = undefined
+			@planned = undefined
+		
+		# Return a token with the next character
+		new CharacterToken token.mistake, char, char != correct_char
+	
+	unknown_token: (token) ->
+		# Unkown token, go to the next one
+		@token = undefined
 		token
 	
 	plan_string: (mistake) ->
