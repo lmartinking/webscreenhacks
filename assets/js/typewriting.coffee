@@ -87,10 +87,23 @@ class StreamAnalyser
 		token = @token ?= @actionstream.next()
 		@process_token(token)
 	
+	exhausted: ->
+		@index == @text.length
+	
 	process_token: (token) ->
 		func_name = "analyse_#{token.constructor.name}"
 		func = @[func_name] ? @unknown_token
 		func.call this, token
+	
+	unknown_token: (token) ->
+		# Unkown token, go to the next one
+		@token = undefined
+		token
+	
+	analyse_PauseToken: (token) ->
+		# Only pause once
+		@token = undefined
+		token
 	
 	analyse_BackspaceToken: (token) ->
 		taking_mistake = @since_last_mistake.pop()
@@ -104,39 +117,34 @@ class StreamAnalyser
 		
 		token
 	
-	analyse_PauseToken: (token) ->
-		# Only pause once
-		@token = undefined
-		token
-	
 	analyse_CharacterToken: (token) ->
+		@record_character_token token
+		[char, correct_char] = @plan_for_character_token(token)
+		new CharacterToken token.mistake, char, char != correct_char
+	
+	record_character_token: (token) ->
+		if token.mistake
+			@since_last_mistake ?= []
+		
+		if @since_last_mistake?
+			@since_last_mistake.push token.mistake
+	
+	plan_for_character_token: (token) ->
 		# Make planned if haven't planned this token yet
 		@planned ?= @plan_string token.mistake
 		[correct, typed] = @planned
 		
-		if token.mistake
-			@since_last_mistake ?= []
-		
-		# Get next char from plan
-		# And add to since_last_mistake if we have such a a list
+		# determine char to use
+		# And correct char that should have been used if typewriter wasn't dyslexic
 		char = typed.pop()
 		correct_char = correct.pop()
-		
-		if @since_last_mistake?
-			@since_last_mistake.push token.mistake
 		
 		# Need a new token if run out of planned
 		if typed.length == 0
 			@token = undefined
 			@planned = undefined
 		
-		# Return a token with the next character
-		new CharacterToken token.mistake, char, char != correct_char
-	
-	unknown_token: (token) ->
-		# Unkown token, go to the next one
-		@token = undefined
-		token
+		[char, correct_char]
 	
 	plan_string: (mistake) ->
 		random = Math.random()
@@ -152,9 +160,6 @@ class StreamAnalyser
 		else
 			@index += length
 			[(char for char in correct), correct]
-	
-	exhausted: ->
-		@index == @text.length
 
 exports.StreamAnalyser = StreamAnalyser
 

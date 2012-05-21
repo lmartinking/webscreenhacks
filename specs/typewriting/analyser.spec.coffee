@@ -162,3 +162,110 @@ describe "Typewriting", ->
                 token = name:'token'
                 @analyser.since_last_mistake = [true]
                 assert.same @analyser.analyse_BackspaceToken(token), token
+
+        describe "Analysing Character Token", ->
+            it "records token", ->
+                token = name:'token'
+                stubbed = @stub @analyser, "record_character_token"
+                @analyser.analyse_CharacterToken token
+                assert.calledWith stubbed, token
+                
+            it "returns new character token", ->
+                assert.equals @analyser.analyse_CharacterToken(name:'token').constructor.name, 'CharacterToken'
+            
+            describe "returned character token", ->
+                it "sets mistake to token.mistake", ->
+                    mistake = name:'mistake'
+                    token = {name:'token', mistake}
+                    stubbed = @stub(@analyser, "plan_for_character_token").returns [1, 2]
+                    
+                    result = @analyser.analyse_CharacterToken(token)
+                    assert.same result.mistake, mistake
+                
+                it "sets char to char from plan_for_character_token", ->
+                    char = name:'char'
+                    token = name:'token'
+                    correct_char = name:'correct_char'
+                    
+                    stubbed = @stub(@analyser, "plan_for_character_token").returns [char, correct_char]
+                    result = @analyser.analyse_CharacterToken(token)
+                    assert.same result.char, char
+                    
+                it "sets noticeable to whether results from plan_for_character_token are different", ->
+                    char = name:'char'
+                    token = name:'token'
+                    correct_char = name:'correct_char'
+                    
+                    stubbed = @stub @analyser, "plan_for_character_token"
+                    
+                    stubbed.returns [1, 2]
+                    assert @analyser.analyse_CharacterToken(token).noticeable
+                    
+                    stubbed.returns [1, 1]
+                    refute @analyser.analyse_CharacterToken(token).noticeable
+                
+            describe "Recording character token", ->
+                it "adds token.mistake to since_last_mistake", ->
+                    mistake = name:'mistake'
+                    token = {name:'token', mistake}
+                    @analyser.since_last_mistake = [1]
+                    @analyser.record_character_token token
+                    assert.equals @analyser.since_last_mistake, [1, mistake]
+                
+                it "doesn't add to since_last_mistake if it is undefined and token isn't a mistake", ->
+                    token = name:'token', 'mistake':false
+                    @analyser.since_last_mistake = undefined
+                    @analyser.record_character_token token
+                    refute.defined @analyser.since_last_mistake
+                
+                it "creates since_last_mistake if it is undefined and token is a mistake", ->
+                    token = name:'token', 'mistake':true
+                    @analyser.since_last_mistake = undefined
+                    @analyser.record_character_token token
+                    assert.equals @analyser.since_last_mistake, [true]
+            
+            describe "planning for character token", ->
+                it "uses existing planned if defined", ->
+                    planned = [[1, 2], [3, 4]]
+                    @analyser.planned = planned
+                    stubbed = @stub @analyser, 'plan_string'
+                    
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [4, 2]
+                    refute.called stubbed
+                    assert.same @analyser.planned, planned
+                    
+                it "uses plan_string to create and set planned if planned not already defined", ->
+                    planned = [[1, 2], [3, 4]]
+                    @analyser.planned = undefined
+                    stubbed = @stub(@analyser, 'plan_string').returns planned
+                    
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [4, 2]
+                    assert.called stubbed
+                    assert.same @analyser.planned, planned
+                
+                it "returns the pop of the two things in defined", ->
+                    @analyser.planned = [[1, 5], [3, 6]]
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [6, 5]
+                
+                it "sets token to undefined if second list in planned is empty after pop", ->
+                    @analyser.token = name:'token'
+                    @analyser.planned = [[1], [3]]
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [3, 1]
+                    refute.defined @analyser.token
+                
+                it "leaves token if second list in planned isn't empty after pop", ->
+                    token = name:'token'
+                    @analyser.token = token
+                    @analyser.planned = [[1, 2], [3, 4]]
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [4, 2]
+                    assert.same @analyser.token, token
+                    
+                it "sets planned to undefined if second list in planned is empty after pop", ->
+                    @analyser.planned = [[1], [3]]
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [3, 1]
+                    refute.defined @analyser.planned
+                    
+                it "leaves planned if second list in planned isn't empty after pop", ->
+                    @analyser.planned = [[1, 7], [3, 8]]
+                    assert.equals @analyser.plan_for_character_token(name:'token'), [8, 7]
+                    assert.equals @analyser.planned, [[1], [3]]
