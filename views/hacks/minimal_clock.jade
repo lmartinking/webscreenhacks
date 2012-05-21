@@ -9,6 +9,10 @@ block extracss
 block extrajs
     != js('jquery.knob.js')
     != js('minimal_clock')
+    :coffeescript
+        do ($ = jQuery) ->
+            $ ->
+                minclock.start_clock $("#clock1"), $("#clock2"), $("#knobs"), $("#timebars")
 
 block content
     #clocks

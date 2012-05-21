@@ -1,3 +1,4 @@
+exports = exports? and @ or @minclock = {}
 settings =
 	time:
 		debug: false
@@ -10,6 +11,10 @@ pad = (num) ->
 		"0#{num}"
 	else
 		"#{num}"
+
+########################
+#   SINGULAR
+########################
 
 class Knob
 	constructor: (@typ, @$el) ->
@@ -50,6 +55,13 @@ class TimeBar
 	draw: (width, duration, easing, complete) ->
 		@$el.stop().animate {width}, duration, easing, complete
 
+exports.Knob = Knob
+exports.TimeBar = TimeBar
+
+########################
+#   COLLECTIONS
+########################
+
 class Knobs
 	constructor: (@container) ->
 		@elements = ['hours', 'minutes', 'seconds']
@@ -87,7 +99,14 @@ class TimeBars
 		
 		else if s == 0
 			@seconds.draw w, 59000, 'linear'
-	
+
+exports.Knobs = Knobs
+exports.TimeBar = TimeBar
+
+########################
+#   CLOCK
+########################
+
 class Clock
 	constructor: (@$el) ->
 		@separators = $ ".separator", @$el
@@ -120,6 +139,12 @@ class Clock
 		@minutes.toggleClass("fadeout").toggleClass("fadein")
 		@seconds.toggleClass("fadeout").toggleClass("fadein")
 
+exports.Clock = Clock
+
+########################
+#   STARTER
+########################
+
 # Make a function that returns the time
 # Debug version forces time to be just before midnight
 make_time_teller = (debug) ->
@@ -150,50 +175,49 @@ make_time_teller = (debug) ->
 			result = [h, m, s]
 			s += progress
 			result
+
+exports.start_clock = ($clock1, $clock2, $knobs, $timebars) ->
+	# Two clocks so we can do nice fades
+	clock1 = new Clock $clock1
+	clock2 = new Clock $clock2
 	
-do ($=jQuery) ->
-	$ ->
-		# Two clocks so we can do nice fades
-		clock1 = new Clock $("#clock1")
-		clock2 = new Clock $("#clock2")
+	knobs = new Knobs $knobs
+	timebars = new TimeBars $timebars
+	
+	# Get function to determine h, m and s
+	time_teller = make_time_teller(settings.time.debug)
+	
+	# Loop that updates drawing
+	twitch = ->
+		[h, m, s] = time_teller(1)
 		
-		knobs = new Knobs $("#knobs")
-		timebars = new TimeBars $("#timebars")
+		# Alternate clocks so that number stays the same when fading
+		if s % 2 == 0
+			clock1.draw h, m, s
+		else
+			clock2.draw h, m, s
 		
-		# Get function to determine h, m and s
-		time_teller = make_time_teller(settings.time.debug)
+		# Toggle both clocks to get the crossfade effect
+		clock1.toggle()
+		clock2.toggle()
 		
-		# Loop that updates drawing
-		twitch = ->
-			[h, m, s] = time_teller(1)
-			
-			# Alternate clocks so that number stays the same when fading
-			if s % 2 == 0
-				clock1.draw h, m, s
-			else
-				clock2.draw h, m, s
-			
-			# Toggle both clocks to get the crossfade effect
-			clock1.toggle()
-			clock2.toggle()
-			
-			# Knobs and timebars not as complicated as clock !
-			knobs.draw h, m, s
-			timebars.draw h, m, s
-		
-		# Setup clocks and make sure one is hidden
-		# And make sure that clock1 is the one that starts hidden
-		# To align with what happens to clock1 in twitch
-		[h, m, s] = time_teller()
-		clock1.setup(s % 2 == 0)
-		clock2.setup(s % 2 == 1)
-		
-		# Initial setup
-		knobs.setup()
-		timebars.setup(new Date().getSeconds())
-		
-		# Don't need to wait a full second for things to appear
-		twitch()
-		
-		# Make it twitch every second
-		setInterval twitch, 1000
+		# Knobs and timebars not as complicated as clock !
+		knobs.draw h, m, s
+		timebars.draw h, m, s
+	
+	# Setup clocks and make sure one is hidden
+	# And make sure that clock1 is the one that starts hidden
+	# To align with what happens to clock1 in twitch
+	[h, m, s] = time_teller()
+	clock1.setup(s % 2 == 0)
+	clock2.setup(s % 2 == 1)
+	
+	# Initial setup
+	knobs.setup()
+	timebars.setup(new Date().getSeconds())
+	
+	# Don't need to wait a full second for things to appear
+	twitch()
+	
+	# Make it twitch every second
+	setInterval twitch, 1000
