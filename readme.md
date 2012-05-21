@@ -3,6 +3,16 @@ Web Screensavers
 
 Some random html pages that display screensaver like things.
 
+Minimal Clock
+-------------
+
+A minimalist clock with funky time bars and time circles.
+
+Dyslexic Typewriter
+-------------------
+
+A typewriter which keeps making annoying mistakes...
+
 Installation
 ============
 
