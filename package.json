@@ -27,6 +27,7 @@
   }
 , "devDependencies":
   { "buster": "*"
+  , "buster-coffee":"*"
   , "supervisor" : "*"
   }
 , "bundleDependencies":

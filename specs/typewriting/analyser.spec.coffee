@@ -1,5 +1,9 @@
-_ = require 'underscore'
-{typing} = require '../../assets/js/typewriting'
+if typeof module != "undefined" and typeof require != "undefined"
+    _ = require 'underscore'
+    {typing} = require '../../assets/js/typewriting'
+else
+    _ = window._
+    typing = window.typing
 
 describe "Typewriting", ->
     describe "Stream Analyser", ->
