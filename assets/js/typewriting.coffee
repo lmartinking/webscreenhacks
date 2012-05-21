@@ -82,6 +82,9 @@ class StreamAnalyser
 	
 	next: ->
 		token = @token ?= @actionstream.next()
+		@process_token(token)
+	
+	process_token: (token) ->
 		func_name = "analyse_#{@token.constructor.name}"
 		func = @[func_name] ? @unknown_token
 		func.call this, token
