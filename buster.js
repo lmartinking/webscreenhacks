@@ -1,4 +1,3 @@
-require("coffee-script")
 var config = module.exports;
 
 config["Tests"] = {
