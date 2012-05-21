@@ -28,6 +28,9 @@ exports.CharacterToken = CharacterToken
 
 class ActionStream
 	constructor: ->
+		@reset()
+	
+	reset: ->
 		@stack = []
 		@needs_pause = false
 	
@@ -211,6 +214,7 @@ exports.start_typwriter = (typewriter) ->
 		
 		twitch = ->
 			if not analyser? or analyser.exhausted()
+				actionstream.reset()
 				analyser = new StreamAnalyser(actionstream, text, keyboard_map)
 			
 			timeout = typewriter.draw(analyser)

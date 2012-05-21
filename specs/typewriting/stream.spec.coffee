@@ -41,6 +41,15 @@ describe "Typewriting", ->
         
         it "defaults needs_pause to false", ->
             expect(@stream.needs_pause).toBe false
+            
+        describe "Resetting", ->
+            it "resets stack and needs_pause", ->
+                @stream.stack = [1, 2]
+                @stream.needs_pause = true
+                @stream.reset()
+                
+                expect(@stream.stack).toEqual []
+                expect(@stream.needs_pause).toBe false
         
         describe "Determining next action", ->
             it "returns a backspace if it should", ->
