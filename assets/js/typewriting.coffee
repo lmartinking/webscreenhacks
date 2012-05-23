@@ -193,6 +193,19 @@ class TypeWriter
 
 exports.TypeWriter = TypeWriter
 
+class WikiTextSource
+	constructor: ->
+		@text = ""
+
+	load: (cb) ->
+		url = 'http://en.wikipedia.org/wiki/Special:Random'
+		$.get '/ajax_proxy?url=' + url, (data) ->
+			page = $.parseXML(data)
+			content = $(page).find("#mw-content-text")
+			$(content).find("table, sup.reference, span.editsection, .reflist, #References, #Further_Reading, #External_links").remove()
+			@text = $(content).text().replace(/(\r\n|\n|\r)/gm, "\n\n")
+			cb(@text)
+
 ########################
 #   STARTER
 ########################
@@ -200,21 +213,18 @@ exports.TypeWriter = TypeWriter
 exports.start_typwriter = (typewriter) ->
 		actionstream = new ActionStream()
 		keyboard_map = new KeyboardMap()
-		
-		text = """
-			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-			Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-			Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-			Excepeur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. 
-		"""
-		
-		analyser = undefined
-		
-		twitch = ->
-			if not analyser? or analyser.exhausted()
-				analyser = new StreamAnalyser(actionstream, text, keyboard_map)
-			
-			timeout = typewriter.draw(analyser)
-			setTimeout twitch, timeout
-		
-		twitch()
+
+		wiki_text = new WikiTextSource()
+		wiki_text.load (text_data) ->
+			text = text_data
+
+			analyser = undefined
+
+			twitch = ->
+				if not analyser? or analyser.exhausted()
+					analyser = new StreamAnalyser(actionstream, text, keyboard_map)
+
+				timeout = typewriter.draw(analyser)
+				setTimeout twitch, timeout
+
+			twitch()
