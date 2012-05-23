@@ -174,7 +174,11 @@ class TypeWriter
 				token.timeout
 			
 			when CharacterToken
-				char_span = $("<span/>").text token.char
+				if token.char == "\n"
+					char_span = $("<span><br/> </span>")
+				else
+					char_span = $("<span/>").text token.char
+
 				if token.noticeable
 					char_span.addClass("noticeable")
 				
