@@ -24,6 +24,7 @@
   , "connect-assets": "2.1.5"
   , "stylus": "*"
   , "nib" : "*"
+  , "request": "*"
   }
 , "devDependencies":
   { "buster": "*"
